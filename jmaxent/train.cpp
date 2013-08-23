@@ -9,20 +9,7 @@
 using namespace std;
 using namespace maxent;
 
-ME_Sample sample(const vector<string> & vt)
-{
-    ME_Sample sample;
-
-    sample.label = vt[0];
-    for (size_t j = 1; j < vt.size(); ++j)
-    {
-        sample.add_feature(vt[j]);
-    }
-
-    return sample;
-}
-
-vector<string> read_line(const string & line) 
+vector<string> split(const string & line) 
 {
     vector<string> vs;
     istringstream is(line);
@@ -38,17 +25,17 @@ void train(ME_Model & model, const string & input, const string & model_path)
 {
     ifstream ifile(input.c_str());
 
-    if (!ifile) 
+    if (!ifile)
     {
         cerr << "error: cannot open " << input << endl; 
         exit(1);
     }
 
     string line;
-    while (getline(ifile, line)) 
+    while (getline(ifile, line))
     {
-        vector<string> vs = read_line(line);
-        ME_Sample mes = sample(vs);
+        vector<string> vs = split(line);
+        ME_Sample mes(vs);
         model.add_training_sample(mes);
     }
 
@@ -58,7 +45,7 @@ void train(ME_Model & model, const string & input, const string & model_path)
 
 void exit_with_help()
 {
-    cerr << "\nUsage: ./me_train [options] training_set_file model_file" << endl
+    cerr << "Usage: train_exe [options] training_set_file model_file" << endl
          << "options:" << endl
          << "-s type : set type of solver (default 2)" << endl
          << "\t0 -- L1 Regularized maxent optimized with owlqn" << endl
@@ -70,7 +57,7 @@ void exit_with_help()
          << "-e sgd_eta0 : set initial learning rate for SGD (default 1)" << endl
          << "-a sgd_alpha : set decay coefficient of learning rate for SGD" << endl
          << "-h heldout : set number of heldout data (default 0)" << endl << endl
-         << "Example: ./me_train -s 0 -h 100 sample.train model" << endl << endl;
+         << "Example: ./me_train -s 0 -h 100 sample.train model" << endl;
     exit(1);
 }
 
